@@ -37,11 +37,11 @@ export const signin = async (req, res, next) => {
     //for the password not to be displayed
     const { password: somehashedpassword, ...rest } = validUser._doc;
 
-    //how long the cookie takes to expire
-    const expiryDate = new Date(Date.now() + 3600000);//1 hour
-
     res
-      .cookie("access_token", token, { httpOnly: true, expires: expiryDate })
+      .cookie("access_token", token, {
+        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 7,
+      })
       .status(200)
       //console the rest except password
       .json({ message: "user logged in succesffuly", user: rest });
