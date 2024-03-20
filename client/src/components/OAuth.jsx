@@ -3,9 +3,11 @@ import { app } from "../firebase";
 import { useDispatch } from "react-redux";
 import { signInSuccess } from "../redux/user/userSlice";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function OAuth() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleGoogleClick = async () => {
     try {
@@ -18,7 +20,7 @@ function OAuth() {
       const googleSignInData = {
         name: result.user.displayName,
         email: result.user.email,
-        photo: result.user.photo,
+        photo: result.user.photoURL,
       };
 
       axios
@@ -28,6 +30,7 @@ function OAuth() {
           console.log("Response:", response.data);
           dispatch(signInSuccess(response.data));
           //   setLoading(false);
+          navigate("/");
         })
         .catch((response) => {
           // Handle error

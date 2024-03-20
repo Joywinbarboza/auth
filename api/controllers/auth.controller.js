@@ -72,7 +72,7 @@ export const google = async (req, res, next) => {
 
       const hashedPassword = bycryptjs.hashSync(generatedPassword, 10);
 
-      console.log(req.body.name);
+      // console.log(req.body.photo);
       const newUser = new User({
         username:
           req.body.name.split(" ").join("").toLowerCase() +
