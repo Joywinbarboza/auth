@@ -8,6 +8,7 @@ import {
 } from "../redux/user/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { capitalizeFirstLetter } from "../utils/utils.js";
+import OAuth from "../components/OAuth.jsx";
 
 function SignIn() {
   const [formData, setFormData] = useState({});
@@ -73,6 +74,7 @@ function SignIn() {
           >
             {loading ? "Loading..." : "Sign In"}
           </button>
+          <OAuth/>
         </form>
         <div className="flex gap-2 mt-5">
           <p>dont have an account?</p>
