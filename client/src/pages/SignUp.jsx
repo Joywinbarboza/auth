@@ -15,7 +15,7 @@ function SignUp() {
     e.preventDefault();
 
     setError(false);
-    setLoading(true);
+    setLoading(true); 
 
     axios
       .post("http://localhost:3000/api/auth/signup", formData)

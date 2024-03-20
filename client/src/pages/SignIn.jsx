@@ -1,12 +1,21 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import {
+  signInStart,
+  signInSuccess,
+  signInFailure,
+} from "../redux/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { capitalizeFirstLetter } from "../utils/utils.js";
 
 function SignIn() {
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { loading, error } = useSelector((state) => state.user);
+  // const [error, setError] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -15,22 +24,26 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setError(false);
-    setLoading(true);
+    dispatch(signInStart());
+
+    // setError(false);
+    // setLoading(true);
 
     axios
       .post("http://localhost:3000/api/auth/signin", formData)
       .then((response) => {
         // Handle response data as needed
         console.log("Response:", response.data);
-        setLoading(false);
+        // setLoading(false);
+        dispatch(signInSuccess(response.data));
         navigate("/");
       })
       .catch((response) => {
         // Handle error
         console.log("Response:", response.response.data);
-        setLoading(false);
-        setError(true);
+        // setLoading(false);
+        // setError(true);
+        dispatch(signInFailure(response.response.data));
       });
   };
 
@@ -67,7 +80,11 @@ function SignIn() {
             <span className="text-blue-500">Sign up</span>
           </Link>
         </div>
-        <p className="text-red-700 mt-5">{error && "Something went wrong"}</p>
+        <p className="text-red-700 mt-5">
+          {error
+            ? capitalizeFirstLetter(error.message || "Something went wrong")
+            : " "}
+        </p>
       </div>
     </>
   );
