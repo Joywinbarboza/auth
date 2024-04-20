@@ -12,6 +12,7 @@ function Profile() {
   const [imagePercent, setImagePercent] = useState(0);
   const [imageError, setImageError] = useState(false);
   const [formData, setFormData] = useState({});
+  const [uploaded, setUploaded] = useState(false);
   const fileRef = useRef(null);
   const currentUser = useSelector((state) => state.user);
 
@@ -20,6 +21,16 @@ function Profile() {
       handleFileUpload(image);
     }
   }, [image]);
+
+  useEffect(() => {
+    if (imagePercent === 100 && !imageError) {
+      const timer = setTimeout(() => {
+        setUploaded(true);
+        console.log(uploaded);
+      }, 2000); // 2000 milliseconds delay
+      return () => clearTimeout(timer); // Cleanup the timer on component unmount
+    }
+  }, [imagePercent, imageError]);
 
   const handleFileUpload = async (image) => {
     console.log(image);
@@ -83,7 +94,7 @@ function Profile() {
                 style={{ width: `${imagePercent}%` }}
               ></div>
             </div>
-          ) : imagePercent === 100 ? (
+          ) : uploaded ? (
             <span className="text-green-500">Image Uploaded</span>
           ) : null}
         </div>
