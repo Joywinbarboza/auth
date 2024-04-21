@@ -41,6 +41,7 @@ export const signin = async (req, res, next) => {
       .cookie("access_token", token, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 365 * 7,
+        path: "/"
       })
       .status(200)
       //console the rest except password

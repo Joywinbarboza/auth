@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getDownloadURL,
   getStorage,
@@ -7,14 +7,53 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { app } from "../firebase";
+import axios from "axios";
+import {
+  updateUserFailure,
+  updateUserStart,
+  updateUserSuccess,
+} from "../redux/user/userSlice";
 function Profile() {
   const [image, setImage] = useState(null);
   const [imagePercent, setImagePercent] = useState(0);
   const [imageError, setImageError] = useState(false);
   const [formData, setFormData] = useState({});
   const [uploaded, setUploaded] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+
   const fileRef = useRef(null);
+  const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user);
+  const { loading, error } = useSelector((state) => state.user);
+
+  const allCookies = document.cookie;
+
+  // Check if cookies exist
+  // if (allCookies) {
+  //   // Split the cookies string into individual cookies
+  //   const cookieArray = allCookies.split(";");
+
+  //   // Find the cookie with the specified name
+  //   const accessTokenCookie = cookieArray.find((cookie) =>
+  //     cookie.trim().startsWith("access_token=")
+  //   );
+
+  //   // Check if the cookie is found
+  //   if (accessTokenCookie) {
+  //     // Split the cookie into name and value
+  //     const [name, value] = accessTokenCookie.split("=");
+  //     // Output the name and value of the cookie
+  //     console.log(`Cookie Name: ${name}, Value: ${value}`);
+  //   } else {
+  //     console.log("Access token cookie not found.");
+  //   }
+  // } else {
+  //   console.log("No cookies found.");
+  // }
+
+  const axios_cookies = axios.create({
+    withCredentials: true,
+  });
 
   useEffect(() => {
     if (image) {
@@ -57,6 +96,58 @@ function Profile() {
       }
     );
   };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log();
+
+    dispatch(updateUserStart());
+    axios_cookies
+      .post(
+        `http://localhost:3000/api/user/update/${currentUser.currentUser.user._id}`,
+        formData
+      )
+      .then((response) => {
+        // Handle response data as needed
+        console.log("Response:", response.data);
+        setUpdateSuccess(true);
+        dispatch(updateUserSuccess(response.data));
+      })
+      .catch((error) => {
+        // Handle error
+        console.log("Error:", error);
+        setUpdateSuccess(false);
+        dispatch(updateUserFailure(error.response));
+      });
+  };
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   console.log("Submit")
+  //   try {
+  //     dispatch(updateUserStart());
+  //     const res = await fetch(`http://localhost:3000/api/user/update/${currentUser.currentUser.user._id}`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(formData),
+  //     });
+  //     const data = await res.json();
+  //     if (data.success === false) {
+  //       dispatch(updateUserFailure(data));
+  //       return;
+  //     }
+  //     dispatch(updateUserSuccess(data));
+  //     setUpdateSuccess(true);
+  //   } catch (error) {
+  //     dispatch(updateUserFailure(error));
+  //   }
+  // };
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -105,6 +196,7 @@ function Profile() {
           placeholder="username"
           className="bg-slate-100 rounded-lg p-3"
           defaultValue={currentUser.currentUser.user.username}
+          onChange={handleChange}
         />
         <input
           type="email"
@@ -112,21 +204,31 @@ function Profile() {
           placeholder="Email"
           className="bg-slate-100 rounded-lg p-3"
           defaultValue={currentUser.currentUser.user.email}
+          onChange={handleChange}
         />
         <input
           type="password"
           id="password"
           placeholder="Pasword"
           className="bg-slate-100 rounded-lg p-3"
+          onChange={handleChange}
         />
-        <button className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80">
-          UPDATE
+        <button
+          onClick={handleSubmit}
+          className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-70"
+          disabled={loading}
+        >
+          {loading ? "Loading..." : "UPDATE"}
         </button>
       </form>
       <div className="flex justify-between mt-5">
         <span className="text-red-700 cursor-pointer">Delete Account</span>
         <span className="text-red-700 cursor-pointer">Sign out</span>
       </div>
+      <p className="text-red-700 m-5">{error && "Something went wrong!"}</p>
+      <p className="text-green-700 m-5">
+        {updateSuccess && "Updated successfully"}
+      </p>
     </div>
   );
 }
