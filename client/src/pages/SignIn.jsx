@@ -29,7 +29,7 @@ function SignIn() {
     // setLoading(true);
 
     axios
-      .post("http://localhost:3000/api/auth/signin", formData,{
+      .post("/api/auth/signin", formData,{
         withCredentials: true,
       })
       .then((response) => {
