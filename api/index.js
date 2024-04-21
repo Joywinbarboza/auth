@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import path from "path";
 dotenv.config();
 
 import userRoutes from "./routes/user.route.js";
@@ -18,6 +19,17 @@ mongoose
   });
 
 const app = express();
+
+//build code starts here
+const __dirname = path.resolve();
+
+app.use(express.static(path.join(__dirname, "/client/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "client", "dist", "index.html"));
+});
+//buid code ends here
+
 app.use(express.json());
 
 app.use(cookieParser());
