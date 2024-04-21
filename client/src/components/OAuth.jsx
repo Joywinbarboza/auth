@@ -24,7 +24,7 @@ function OAuth() {
       };
 
       axios
-        .post("http://localhost:3000/api/auth/google", googleSignInData, {
+        .post("/api/auth/google", googleSignInData, {
           withCredentials: true,
         })
         .then((response) => {
