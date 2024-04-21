@@ -21,7 +21,7 @@ function SignUp() {
     setLoading(true); 
 
     axios
-      .post("http://localhost:3000/api/auth/signup", formData,{
+      .post("/api/auth/signup", formData,{
         withCredentials: true,
       })
       .then((response) => {
