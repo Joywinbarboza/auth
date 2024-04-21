@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 import axios from "axios";
 import OAuth from "../components/OAuth";
 
@@ -7,6 +7,8 @@ function SignUp() {
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -26,6 +28,7 @@ function SignUp() {
         // Handle response data as needed
         console.log("Response:", response.data);
         setLoading(false);
+        navigate("/sign-in");
       })
       .catch((response) => {
         // Handle error
@@ -35,7 +38,6 @@ function SignUp() {
       });
   };
 
-  // console.log(loading);
   return (
     <>
       <div className="p-3 max-w-lg mx-auto">

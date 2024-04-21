@@ -24,7 +24,9 @@ function OAuth() {
       };
 
       axios
-        .post("http://localhost:3000/api/auth/google", googleSignInData)
+        .post("http://localhost:3000/api/auth/google", googleSignInData, {
+          withCredentials: true,
+        })
         .then((response) => {
           // Handle response data as needed
           console.log("Response:", response.data);
@@ -35,8 +37,6 @@ function OAuth() {
         .catch((response) => {
           // Handle error
           console.log("Response:", response.response.data);
-          //   setLoading(false);
-          //   setError(true);
         });
     } catch (error) {
       console.log("couldn't login with Google", error);

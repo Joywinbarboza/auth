@@ -41,7 +41,7 @@ export const signin = async (req, res, next) => {
       .cookie("access_token", token, {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 365 * 7,
-        path: "/"
+        path: "/",
       })
       .status(200)
       //console the rest except password
@@ -100,4 +100,11 @@ export const google = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const signout = async (req, res, next) => {
+  res
+    .clearCookie("access_token")
+    .status(200)
+    .json("user logged out succesffuly");
 };

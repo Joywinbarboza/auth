@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   getDownloadURL,
   getStorage,
@@ -9,6 +10,10 @@ import {
 import { app } from "../firebase";
 import axios from "axios";
 import {
+  deleteUserFailure,
+  deleteUserStart,
+  deleteUserSuccess,
+  signOut,
   updateUserFailure,
   updateUserStart,
   updateUserSuccess,
@@ -21,35 +26,11 @@ function Profile() {
   const [uploaded, setUploaded] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
+  const navigate = useNavigate();
   const fileRef = useRef(null);
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.user);
   const { loading, error } = useSelector((state) => state.user);
-
-  const allCookies = document.cookie;
-
-  // Check if cookies exist
-  // if (allCookies) {
-  //   // Split the cookies string into individual cookies
-  //   const cookieArray = allCookies.split(";");
-
-  //   // Find the cookie with the specified name
-  //   const accessTokenCookie = cookieArray.find((cookie) =>
-  //     cookie.trim().startsWith("access_token=")
-  //   );
-
-  //   // Check if the cookie is found
-  //   if (accessTokenCookie) {
-  //     // Split the cookie into name and value
-  //     const [name, value] = accessTokenCookie.split("=");
-  //     // Output the name and value of the cookie
-  //     console.log(`Cookie Name: ${name}, Value: ${value}`);
-  //   } else {
-  //     console.log("Access token cookie not found.");
-  //   }
-  // } else {
-  //   console.log("No cookies found.");
-  // }
 
   const axios_cookies = axios.create({
     withCredentials: true,
@@ -103,7 +84,6 @@ function Profile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log();
 
     dispatch(updateUserStart());
     axios_cookies
@@ -125,29 +105,43 @@ function Profile() {
       });
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   console.log("Submit")
-  //   try {
-  //     dispatch(updateUserStart());
-  //     const res = await fetch(`http://localhost:3000/api/user/update/${currentUser.currentUser.user._id}`, {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(formData),
-  //     });
-  //     const data = await res.json();
-  //     if (data.success === false) {
-  //       dispatch(updateUserFailure(data));
-  //       return;
-  //     }
-  //     dispatch(updateUserSuccess(data));
-  //     setUpdateSuccess(true);
-  //   } catch (error) {
-  //     dispatch(updateUserFailure(error));
-  //   }
-  // };
+  const handleDeleteAccount = async () => {
+    dispatch(deleteUserStart());
+    axios_cookies
+      .post(
+        `http://localhost:3000/api/user/delete/${currentUser.currentUser.user._id}`
+      )
+      .then((response) => {
+        // Handle response data as needed
+        console.log("Response:", response.data);
+        // setUpdateSuccess(true);
+        dispatch(deleteUserSuccess());
+        navigate("/");
+      })
+      .catch((error) => {
+        // Handle error
+        console.log("Error:", error);
+        // setUpdateSuccess(false);
+        dispatch(deleteUserFailure(error.response));
+      });
+  };
+
+  const handleSignOut = async () => {
+    // dispatch(deleteUserStart());
+    axios_cookies
+      .get(`http://localhost:3000/api/auth/signout`)
+      .then((response) => {
+        // Handle response data as needed
+        console.log("Response:", response.data);
+        // setUpdateSuccess(true);
+        dispatch(signOut());
+        navigate("/sign-in");
+      })
+      .catch((error) => {
+        // Handle error
+        console.log("Error:", error);
+      });
+  };
 
   return (
     <div className="p-3 max-w-lg mx-auto">
@@ -222,8 +216,15 @@ function Profile() {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete Account</span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span
+          onClick={handleDeleteAccount}
+          className="text-red-700 cursor-pointer"
+        >
+          Delete Account
+        </span>
+        <span onClick={handleSignOut} className="text-red-700 cursor-pointer">
+          Sign out
+        </span>
       </div>
       <p className="text-red-700 m-5">{error && "Something went wrong!"}</p>
       <p className="text-green-700 m-5">
