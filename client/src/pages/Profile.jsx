@@ -88,7 +88,7 @@ function Profile() {
     dispatch(updateUserStart());
     axios_cookies
       .post(
-        `http://localhost:3000/api/user/update/${currentUser.currentUser.user._id}`,
+        `/api/user/update/${currentUser.currentUser.user._id}`,
         formData
       )
       .then((response) => {
@@ -109,7 +109,7 @@ function Profile() {
     dispatch(deleteUserStart());
     axios_cookies
       .post(
-        `http://localhost:3000/api/user/delete/${currentUser.currentUser.user._id}`
+        `/api/user/delete/${currentUser.currentUser.user._id}`
       )
       .then((response) => {
         // Handle response data as needed
@@ -129,7 +129,7 @@ function Profile() {
   const handleSignOut = async () => {
     // dispatch(deleteUserStart());
     axios_cookies
-      .get(`http://localhost:3000/api/auth/signout`)
+      .get(`/api/auth/signout`)
       .then((response) => {
         // Handle response data as needed
         console.log("Response:", response.data);
